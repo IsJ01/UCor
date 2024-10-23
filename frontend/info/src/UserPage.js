@@ -7,10 +7,13 @@ import './css/user_page.css';
 import user_img from './img/User.png';
 import CancelButton from "./reusable/CancelButton";
 import Report from "./reusable/Report";
-import {get_black_list, get_report_categories, get_report_category, get_reports, get_tasks, get_user, get_user_from_email, get_users} from './give_objects';
+import {get_black_list, get_chats, get_report_categories, get_report_category, get_reports, get_tasks, get_user, get_user_from_email, get_users} from './give_objects';
 import DropMenu from "./reusable/DropMenu";
 import { tasks_api_url } from "./give_objects";
 import Task from "./reusable/Task";
+import SearchBar from "./chat/SearchBar";
+import AddChatDialog from "./chat/AddChatDialog";
+import Chats from "./chat/Chats";
 
 export default function UserPage() {
     const { id } = useParams();
@@ -19,6 +22,7 @@ export default function UserPage() {
     const [mode, setMode] = useState('');
     const [isOpenMenu, setIsOpenMenu] = useState(false);
     const [inBlackList, setInBlackList] = useState(false);
+    const [userFilter, setUserFilter] = useState("");
     const users_api_url = 'http://localhost:8001';
     const reports_api_url = "http://127.0.0.1:8002";
     const report_categories_api_url = "http://127.0.0.1:8006";
@@ -295,11 +299,37 @@ export default function UserPage() {
             );
         }
         else if (mode == 'messages') {
+            let chats = get_chats().filter(chat => chat.user1 == user.id || chat.user2 == user.id)
+                .map(chat => {
+                    if (chat.user1 == user.id) {
+                        return {id: chat.id, user1: user, user2: get_user(chat.user2), messages: chat.messages};
+                    } 
+                    if (chat.user2 == user.id) {
+                        return {id: chat.id, user1: get_user(chat.user1), user2: user, messages: chat.messages};
+                    }
+                })
+                .filter(chat => (chat.user1.id == user.id && chat.user2.username.includes(userFilter)) ||
+                    (chat.user2.id == user.id && chat.user1.username.includes(userFilter)));
             panel = (
                 <div>
-                    <h1 style={{textAlign: 'center'}}>In development</h1>
+                    {
+                        user.id == pageUser.id
+                        &&
+                            <div>
+                                <AddChatDialog user={user} users={get_users().filter(u => u.id != user.id)}/>
+                                <SearchBar onSearch={(e) => setUserFilter(e.target.value)}/>
+                                <Chats user={user} chats={chats}/>
+                            </div>
+                        }
                 </div>
             );
+            if (inBlackList) {
+                panel = (
+                    <div>
+                        <h1>User in black list</h1>
+                    </div>
+                );
+            }
         }
         return panel;
     }
@@ -332,8 +362,10 @@ export default function UserPage() {
             user_tasks && struct.push(user_tasks);
             to_user_tasks && struct.push(to_user_tasks);
         }
-        struct.push({onClick: set_new_mode('messages'), 
-            title: "Messages", innerText: "Messages (in development)"});
+        if (user.id == pageUser.id) {
+            struct.push({onClick: set_new_mode('messages'), 
+            title: "Messages", innerText: "Messages"});
+        }
         return struct;
     }
 
@@ -348,12 +380,16 @@ export default function UserPage() {
                 </label>
             </dialog>
             <div className="user-info">
-                <p style={{marginBottom: '0px', paddingLeft: '10px'}}>
-                    <button id="user-menu-button" className="styleBtn-outline-normal configure-btn" 
-                        title="Settings" onClick={open_menu}>⮞</button>
-                    <DropMenu id="user-menu" className="" 
-                        struct={get_drop_menu_struct()}/>
-                </p>
+                {
+                    (pageUser.id == user.id || (user.is_staff && !pageUser.is_superuser))
+                    &&
+                    <p style={{marginBottom: '0px', paddingLeft: '10px'}}>
+                        <button id="user-menu-button" className="styleBtn-outline-normal configure-btn" 
+                            title="Settings" onClick={open_menu}>⮞</button>
+                        <DropMenu id="user-menu" className="" 
+                            struct={get_drop_menu_struct()}/>
+                    </p>
+                }
                 <label className="user-info-name">
                     <img className="user-image" width={100} height={100} src={pageUser.image ? pageUser.image : user_img}/>
                 </label>

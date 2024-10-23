@@ -7,6 +7,8 @@ const data_api_url = "http://127.0.0.1:8004";
 const user_categories_api_url = "http://127.0.0.1:8005";
 const report_categories_api_url = "http://127.0.0.1:8006";
 const tasks_api_url = "http://127.0.0.1:8007/api/v1";
+const chats_api_url = "http://127.0.0.1:8008/api/v1/chats";
+const messages_api_url = "http://127.0.0.1:8008/api/v1/messages";
 
 // данная функция получает api и возвращает функцию, которая возвращает объекты данного api
 
@@ -26,6 +28,8 @@ let get_user_categories = get_objects(user_categories_api_url);
 let get_report_categories = get_objects(report_categories_api_url);
 let get_organization_data = get_objects(data_api_url);
 let get_tasks = get_objects(tasks_api_url);
+let get_chats = get_objects(chats_api_url);
+let get_messages = get_objects(messages_api_url);
 
 
 function get_user(id) {
@@ -64,9 +68,9 @@ function get_data_field(id) {
 }
 
 export {
-    users_api_url, reports_api_url, black_list_api_url, user_categories_api_url, report_categories_api_url, data_api_url, tasks_api_url,
+    users_api_url, reports_api_url, black_list_api_url, user_categories_api_url, report_categories_api_url, data_api_url, tasks_api_url, chats_api_url, messages_api_url,
     get_users, get_reports, get_black_list, get_user_categories, get_report_categories, get_organization_data,
-    get_user, get_user_from_email, get_report, get_black_user, get_user_category, get_report_category, get_data_field, get_tasks
+    get_user, get_user_from_email, get_report, get_black_user, get_user_category, get_report_category, get_data_field, get_tasks, get_chats, get_messages
 }
 
 
