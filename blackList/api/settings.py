@@ -69,7 +69,7 @@ CORS_ALLOW_HEADERS = ('Access-Control-Allow-Origin',
                       'Access-Control-Allow-Credentials',
                       'content-disposition', 'accept-encoding',
                       'content-type', 'accept', 'origin', 'Authorization',
-                      'access-control-allow-methods', 'X-CSRFToken')
+                      'access-control-allow-methods', 'X-CSRFToken', 'sessionid')
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
@@ -136,6 +136,8 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
+
+STATIC_URL = 'static/'
 
 USE_I18N = True
 

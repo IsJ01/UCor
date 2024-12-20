@@ -31,7 +31,8 @@ export default function BlackList() {
             user: get_user_from_email(document.getElementById('black-list-user').value.trim()).id,
             cause: document.getElementById('black-list-cause').value.trim(),
         };
-        axios.post(`${black_list_api_url}/`, data);
+        axios.post(`${black_list_api_url}/`, data, 
+            {headers: {sessionid: get_sessionid()}});
         window.location.reload(true);
     }
 
@@ -45,7 +46,7 @@ export default function BlackList() {
 
     function delete_from_black_list() {
         if (selectedUser) {
-            axios.delete(`${black_list_api_url}/${selectedUser}/`);
+            axios.delete(`${black_list_api_url}/${selectedUser}/`, {headers: {sessionid: get_sessionid()}});
             window.location.reload(true);
         }
     }

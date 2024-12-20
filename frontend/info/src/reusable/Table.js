@@ -41,13 +41,15 @@ export default function Table(props) {
 
     let rows = props.rows.map(row => 
         <tr>
-            {row[0].isId && <td style={{border: "1px solid black", textAlign: "center"}}>
+            {row[0].isId && <td style={{border: "1px solid black", textAlign: "center", 
+                        borderRadius: "3px"}}>
                     <input style={{border: 'none', background: 'none'}} type="button"
                      onClick={onClick(row[0].onclick)} value={row[0].text} onBlur={focusOut(row[0].onblur)}/>
                 </td>
             }
             {row.slice(1).map(col => 
-                    <td style={{border: "1px solid black", textAlign: "center"}}>
+                    <td style={{border: "1px solid black", textAlign: "center", 
+                        borderRadius: "3px"}}>
                         {get_column(col)}
                     </td>
                 )
@@ -56,9 +58,15 @@ export default function Table(props) {
     );
     return (
         <>
-            <table style={{borderCollapse: "separate", border: "1px solid black", minWidth: '300px'}}>
+            <table style={{borderCollapse: "separate", border: "1px solid black", minWidth: '300px', borderRadius: "5px"}}>
                 <thead>
-                    <tr>{props.headers.map(col => <th style={{border: "1px solid black", textAlign: "center", minWidth: "50px"}}>
+                    <tr>{props.headers.map(col => <th
+                        style={{border: "1px solid black", 
+                        textAlign: "center", 
+                        minWidth: "50px",
+                        background: "rgb(210, 210, 210)",
+                        borderRadius: "3px"
+                        }}>
                             {col}
                         </th>)}
                     </tr>

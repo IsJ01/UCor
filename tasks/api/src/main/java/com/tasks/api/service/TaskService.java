@@ -63,7 +63,7 @@ public class TaskService {
     public Optional<TaskReadDto> update(Integer id, TaskCreateEditDto dto) {
         return taskRepository.findById(id)
             .map(entity -> taskCreateEditMapper.map(dto, entity))
-            .map(taskRepository::save)
+            .map(taskRepository::saveAndFlush)
             .map(taskReadMapper::map);
     }
 

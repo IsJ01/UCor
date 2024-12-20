@@ -5,6 +5,7 @@ import "./css/chats.css";
 import "../css/buttons.css"
 import axios from "axios";
 import { chats_api_url } from "../give_objects";
+import { get_sessionid } from "../get_cookies";
 
 function current_chat(chat, user) {
 
@@ -18,7 +19,7 @@ function current_chat(chat, user) {
 }
 
 function delete_chat(id) {
-    axios.delete(`${chats_api_url}/${id}/`);
+    axios.delete(`${chats_api_url}/${id}/`, {headers: {sessionid: get_sessionid()}});
     window.location.reload(true);
 }
 

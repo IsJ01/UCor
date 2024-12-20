@@ -4,11 +4,12 @@ import Message from "./Message";
 
 import "./css/chat.css";
 import { messages_api_url } from "../give_objects";
+import { get_sessionid } from "../get_cookies";
 
 function send_message(id, of, near) {
     return function () {
         let data = {chatId: id, of: of, near: near, text: document.getElementById("message").value};
-        axios.post(`${messages_api_url}/`, data);
+        axios.post(`${messages_api_url}/`, data, {headers: {sessionid: get_sessionid()}});
         window.location.reload(true);
     }
 }

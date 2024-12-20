@@ -13,7 +13,7 @@ spring:
   application:
     name: api
   datasource:
-    url: jdbc:postgresql://tasks_db:5432/tasks
+    url: jdbc:postgresql://localhost:5432/tasks
     username: isj01
     password: is067
     driver-class-name: org.postgresql.Driver

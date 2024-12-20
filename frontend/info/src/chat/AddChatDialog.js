@@ -4,6 +4,7 @@ import Row from "./Row";
 
 import "./css/add_chat_dialog.css";
 import { chats_api_url } from "../give_objects";
+import { get_sessionid } from "../get_cookies";
 
 function add_chat(u) {
     return function(e) {
@@ -14,7 +15,7 @@ function add_chat(u) {
             id = e.target.parentNode.id;
         }
         let data = {user1: u.id, user2: parseInt(id)};
-        axios.post(`${chats_api_url}/`, data);
+        axios.post(`${chats_api_url}/`, data, {headers: {sessionid: get_sessionid()}});
         document.getElementById("add-chat-dialog").close()
         window.location.reload(true);
     }

@@ -15,7 +15,8 @@ import SearchBar from "./chat/SearchBar";
 import AddChatDialog from "./chat/AddChatDialog";
 import Chats from "./chat/Chats";
 
-export default function UserPage() {
+
+export default function UserPage(props) {
     const { id } = useParams();
     const [user, setUser] = useState({});
     const [pageUser, setPageUser] = useState({});
@@ -70,12 +71,18 @@ export default function UserPage() {
         if (!number) {
             data = {...data, number: ""};
         }
-        axios.patch(`${users_api_url}/${pageUser.id}/`, data, {headers: {'content-type': 'multipart/form-data'}});
+        axios.patch(`${users_api_url}/${pageUser.id}/`, data, 
+            {headers: {'content-type': 'multipart/form-data',
+                'sessionid': get_sessionid()
+            }});
         let new_password = document.getElementById('password-input').value;
         let repeat_new_password = document.getElementById('repeat-password-input').value;
         if (new_password != false && new_password == repeat_new_password) {
             axios.put(`${users_api_url}/${pageUser.id}/password/`, 
-                {password: new_password});
+                {password: new_password}, 
+                {
+                    headers: {sessionid: get_sessionid()}
+                });
         }
         window.location.reload(true);
     }
@@ -128,7 +135,8 @@ export default function UserPage() {
         let to_user = users.filter(user => user.email == to)[0];
         let cat = categories.filter(cat => cat.name == category)[0];
         axios.post(`${reports_api_url}/`, {title: title, to: to_user.id, of: user.id, 
-            category: cat.id, description: details})
+            category: cat.id, description: details},
+            {headers: {sessionid: get_sessionid()}})
         window.location.reload(true);
     }
 
@@ -136,7 +144,9 @@ export default function UserPage() {
         let to = document.getElementById('task-dialog-to').value;
         let description = document.getElementById('task-dialog-desc').value;
         let to_user = get_user_from_email(to);
-        axios.post(`${tasks_api_url}/`, {near: to_user.id, of: user.id, description: description, status: "IN_PROGRESS"})
+        axios.post(`${tasks_api_url}/`, {near: to_user.id, of: user.id, description: description, status: "IN_PROGRESS"},
+            {headers: {sessionid: get_sessionid()}}
+        )
         window.location.reload(true);
     }
 
@@ -148,7 +158,9 @@ export default function UserPage() {
                     "near": props.near, 
                     "of": props.of,
                     "description": props.description,
-                    "status": value.trim()})
+                    "status": value.trim()},
+                    {headers: {sessionid: get_sessionid()}}
+                )
                 .catch(e => console.log(e));
                 window.location.reload(true);
             }

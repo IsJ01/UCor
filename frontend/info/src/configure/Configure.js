@@ -1,14 +1,19 @@
 import { useState, useEffect, } from "react";
 import axios from "axios";
 
-import { get_sessionid } from "./get_cookies.js";
-import SideBar from './reusable/SideBar.js';
+import { get_sessionid } from "../get_cookies.js";
+import SideBar from '../reusable/SideBar.js';
 import './css/configure.css';
 import './css/fields.css';
-import CancelButton from "./reusable/CancelButton.js";
-import { get_black_list } from "./give_objects.js";
+import CancelButton from "../reusable/CancelButton.js";
+import { get_black_list } from "../give_objects.js";
+import Cell from "./Cell.js";
+import { getConfigurationText } from "../getText.js";
 
 function Fields(props) {
+
+    const [t1, setT1] = useState("")
+
     const COLUMN_WIDTH = '80px';
 
     let headers = props.headers.map(row => <th className="table-col" 
@@ -25,22 +30,13 @@ function Fields(props) {
                 style={{textAlign: "center", minWidth: COLUMN_WIDTH, overflow: "hidden"}}>
                 {row.id.tag == "input" ? 
                 <input onBlur={focusOut} className={`fields-input`} type={row.id.isId ? 'button' : 'text'} id={row.id.text} 
-                defaultValue={row.id.text} style={{textAlign: "center", maxWidth: COLUMN_WIDTH, overflow: "hidden", 
+                value={row.id.text} style={{textAlign: "center", maxWidth: COLUMN_WIDTH, overflow: "hidden", 
                     background: 'none', cursor: "pointer"}}/> : row.id.text}
             </td>
-            <td className={`table-col`} style={{textAlign: "center", minWidth: COLUMN_WIDTH, overflow: "hidden"}}>
-                {row.col1.tag == "input" ? 
-                <input onBlur={focusOut} className={`fields-input`} type="text" id={row.col1.id} defaultValue={row.col1.text}
-                    style={{textAlign: "center", maxWidth: COLUMN_WIDTH, overflow: "hidden"}}
-                    />
-                : row.col1.text}
-            </td>
-            {row.col2 && <td className={`table-col`} style={{textAlign: "center", minWidth: COLUMN_WIDTH, overflow: "hidden"}}>
-                {row.col2.tag == "input" ? 
-                <input onBlur={focusOut} className={`fields-input`} type="text" id={row.col2.id} defaultValue={row.col2.text}
-                    style={{textAlign: "center", maxWidth: COLUMN_WIDTH, overflow: "hidden"}}/>
-                : row.col2.text}
-            </td>}
+            <Cell COLUMN_WIDTH={COLUMN_WIDTH} focusOut={focusOut} col={row.col1}/>
+            {row.col2 ? <Cell COLUMN_WIDTH={COLUMN_WIDTH} focusOut={focusOut} col={row.col2} />
+            :
+            <></>}
         </tr>
     );
     return (
@@ -57,7 +53,7 @@ function Fields(props) {
     );
 }
 
-export default function Configure() {
+export default function Configure(props) {
     const [user, setUser] = useState({});
     // тип поля
     const [type, setType] = useState("Organization");
@@ -74,6 +70,7 @@ export default function Configure() {
     const user_categories_api_url = "http://127.0.0.1:8005";
     const report_categories_api_url = "http://127.0.0.1:8006";
     let headers = [];
+    let text = getConfigurationText(props.lang);
 
     useEffect(() => {
         update_user();
@@ -129,7 +126,7 @@ export default function Configure() {
 
     // в зависимости от того, что мы хотим натсроить, функция обновляет все поля
     function select(event) {
-        if (event.target.value == 'Organization') {
+        if (event.target.value == text.orgTitle) {
             axios.get(data_api_url).then(res => {
                 // структура таблица такова: каждая строчка имеет по две-три строки, которые имеют текс, id и класс, а также тег
                 let rows = res.data.map(field => (
@@ -146,7 +143,7 @@ export default function Configure() {
                 setType('organization');
             });
         }
-        if (event.target.value == 'User categories') {
+        if (event.target.value == text.uCat) {
             axios.get(user_categories_api_url).then(res => {
                 let rows = res.data.map(field => (
                     {
@@ -161,7 +158,7 @@ export default function Configure() {
                 setType('user category');
             });
         }
-        if (event.target.value == 'Reports categories') {
+        if (event.target.value == text.rCat) {
             axios.get(report_categories_api_url).then(res => {
                 let rows = res.data.map(field => (
                     {
@@ -176,7 +173,7 @@ export default function Configure() {
                 setType('report category');
             });
         }
-        if (event.target.value == 'Staff') {
+        if (event.target.value == text.staffTitle) {
             axios.get(users_api_url).then(res => {
                 let rows = res.data.map(field => (field.is_staff &&
                     {
@@ -187,12 +184,12 @@ export default function Configure() {
                 ));
                 setSelectedRows(res.data.filter(user => user.is_staff));
                 setSelectedRow({});
-                setObjects(res.data.filter(user_ => !user_.is_staff));
+                setObjects(res.data.filter(user_ => !user_.is_staff && !user_.is_superuser));
                 setRows(rows.filter(row => typeof row == 'object'));
                 setType('staff');
             });
         }
-        if (event.target.value != 'Staff') {
+        if (event.target.value != text.staffTitle) {
             setSelectedRows([]);
             setSelectedRow({});
             setObjects([]);
@@ -278,15 +275,19 @@ export default function Configure() {
         let url;
         if (type == 'staff') {
             // если пользователь в таблице - то он становится членом персонала
-            for (let row of selectedRows) {
+            for (let row of selectedRows) { 
                 if (row && !row.delete) {
-                    axios.patch(`${users_api_url}/${row.id}/`, {is_staff: true}).catch(err => console.log(err));
+                    axios.patch(`${users_api_url}/${row.id}/`, {is_staff: true}, {
+                        headers: {sessionid: get_sessionid()}
+                    }).catch(err => console.log(err));
                 }
             }
-            // в противном случае - он лишается этого звания
+            // в противном случае - он лишается этого статуса
             for (let row of objects) {
-                    axios.patch(`${users_api_url}/${row.id}/`, {is_staff: false}).catch(err => console.log(err));
-                }
+                    axios.patch(`${users_api_url}/${row.id}/`, {is_staff: false},
+                        {headers: {sessionid: get_sessionid()}}
+                    ).catch(err => console.log(err));
+            }
             }
         else {
             if (type == 'user category') {
@@ -312,14 +313,17 @@ export default function Configure() {
                                     return;
                                 }
                             }
-                            axios.post(`${url}/`, {name: name, value: value}).catch(err => console.log(err));
+                            axios.post(`${url}/`, 
+                                {name: name, value: value},
+                                {headers: {sessionid: get_sessionid()}}
+                            ).catch(err => console.log(err));
                         } 
                         // если он уже есть, то он обновляется
                         else {
-                            axios.put(`${url}/${row.id}/`, {name: name, value: value}).catch(err => console.log(err));
+                            axios.put(`${url}/${row.id}/`, {name: name, value: value}, 
+                                {headers: {sessionid: get_sessionid()}}).catch(err => console.log(err));
                         }
                     } 
-                    // удаление объекта
                     else {
                         let name = document.getElementById(`${row.id}_1`).value
                         if (row.id[0] == '?') {
@@ -328,13 +332,17 @@ export default function Configure() {
                                     return;
                                 }
                             }
-                            axios.post(`${url}/`, {name: name}).catch(err => console.log(err));
+                            axios.post(`${url}/`, {name: name}, 
+                                {headers: {sessionid: get_sessionid()}}).catch(err => console.log(err));
                         } else {
-                            axios.put(`${url}/${row.id}/`, {name: name}).catch(err => console.log(err));
+                            axios.put(`${url}/${row.id}/`, {name: name}, 
+                                {headers: {sessionid: get_sessionid()}}).catch(err => console.log(err));
                         }
                     }
+                // удаление объекта
                 } else if (row && row.delete && row.id[0] != '?') {
-                    axios.delete(`${url}/${row.id}/`).catch(err => console.log(err.response));
+                    axios.delete(`${url}/${row.id}/`, { headers: {sessionid: get_sessionid()} }
+                    ).catch(err => console.log(err.response));
                 }
             }
         }
@@ -362,11 +370,11 @@ export default function Configure() {
                     </form>
                 </dialog>}
                 <div className="main">
-                    <SideBar rows={[{Dates: [
-                                {onclick: select, className: 'chapter', id: 'chapter-1', text: 'Organization', focus: true},
-                                {onclick: select, className: 'chapter', id: 'chapter-2', text: 'User categories', focus: false},
-                                {onclick: select, className: 'chapter', id: 'chapter-3', text: 'Reports categories', focus: false},
-                                {onclick: select, className: 'chapter', id: 'chapter-4', text: 'Staff', focus: false}
+                    <SideBar rows={[{[text.listTitle]: [
+                                {onclick: select, className: 'chapter', id: 'chapter-1', text: text.orgTitle, focus: true},
+                                {onclick: select, className: 'chapter', id: 'chapter-2', text: text.uCat, focus: false},
+                                {onclick: select, className: 'chapter', id: 'chapter-3', text: text.rCat, focus: false},
+                                {onclick: select, className: 'chapter', id: 'chapter-4', text: text.staffTitle, focus: false}
                             ]}]}/>
                     <div className="central" id="central">
                         <div className="fields" id="fields">

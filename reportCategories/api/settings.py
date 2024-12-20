@@ -69,7 +69,7 @@ CORS_ALLOW_HEADERS = ('Access-Control-Allow-Origin',
                       'Access-Control-Allow-Credentials',
                       'content-disposition', 'accept-encoding',
                       'content-type', 'accept', 'origin', 'Authorization',
-                      'access-control-allow-methods', 'X-CSRFToken')
+                      'access-control-allow-methods', 'X-CSRFToken', "sessionid")
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
@@ -144,8 +144,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-
-
 
 STATIC_URL = 'static/'
 

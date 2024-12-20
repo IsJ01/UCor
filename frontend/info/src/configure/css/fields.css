@@ -13,7 +13,12 @@
 }
 
 .fields-table, .table-col {
+    border-radius: 5px;
     border: 1px solid black;
+}
+
+.table-col {
+    border-radius: 3px;
 }
 
 .fields-table {

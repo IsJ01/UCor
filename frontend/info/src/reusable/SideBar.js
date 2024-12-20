@@ -61,9 +61,11 @@ export default function SideBar(props) {
             sections[Object.keys(row)[0]] = [];
 
             for (let section of Object.values(row)[0]) {
-                rows.push(<input type="button" style={style} 
-                    onClick={select(section.onclick)} className={section.className}
-                    id={section.id} value={section.text}/>);
+                rows.push(
+                    <input type="button" style={style} 
+                        onClick={select(section.onclick)} className={section.className}
+                        id={section.id} value={section.text}/>
+                );
                     sections[Object.keys(row)[0]].push(section.id);
             }
             rows.push(<div style={{height: '10px'}}></div>);

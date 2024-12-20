@@ -43,6 +43,7 @@ class LoginView(views.APIView):
 
 # представление, которое передает нам текущего пользователя
 class UserView(views.APIView):
+
     def get(self, request):
         # мы получаем id сессии из заголовка запроса
         try:
@@ -98,15 +99,45 @@ class UserListView(generics.ListCreateAPIView):
         return response.Response({'detail': 'Password or email is invalid'}, status=400)
 
 
+def get_user(request):
+    try:
+        session_id = request.headers['Sessionid']
+    except KeyError:
+        session_id = ''
+    try:
+        session = Session.objects.get(session_key=session_id)
+        user = User.objects.get(id=session.get_decoded()['_auth_user_id'])
+        return UserSerializer(user).data
+    except Exception as e:
+        return UserSerializer(AnonymousUser).data
+
+
 # представление получения, обновление, удаления пользователя
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
+    def update(self, request, *args, **kwargs):
+        of = get_user(request)
+        if (((not of['is_staff']) and (int(of['id']) != kwargs['pk']))
+                or ('is_staff' in request.data and not of['is_staff'])):
+            return response.Response(status=403)
+        return super().update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        of = get_user(request)
+        if not of['is_staff'] or int(of['id']) != kwargs['pk']:
+            return response.Response(status=403)
+        return super().delete(request, *args, **kwargs)
+
 
 class UpdatePasswordView(views.APIView):
+
     def put(self, request, *args, **kwargs):
+        of = get_user(request)
         user = User.objects.get(id=kwargs['pk'])
+        if not of['is_staff'] or int(of['id']) != kwargs['pk']:
+            return response.Response(status=403)
         user.set_password(request.data.get('password'))
         user.save()
         return response.Response({'message': 'Ok'}, status=200)

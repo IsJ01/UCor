@@ -53,9 +53,65 @@ services:
   
   tasks:
     build:
-      context: ./tasks/api/target
+      context: ./tasks/api
     ports:
       - "8007:8007"
     depends_on:
       - tasks_db
 
+  chats_db:
+    image: postgres
+    environment:
+      POSTGRES_USER: isj01
+      POSTGRES_PASSWORD: is067
+      POSTGRES_DB: chats
+    ports:
+      - 5433:5432
+
+  chats:
+    build:
+      context: ./chats/api
+    ports:
+      - "8008:8008"
+    depends_on:
+      - chats_db
+
+  services_db:
+    image: postgres
+    environment:
+      POSTGRES_USER: isj01
+      POSTGRES_PASSWORD: is067
+      POSTGRES_DB: services
+    ports:
+      - 5434:5432
+
+  tables:
+    build:
+      context: ./tables/api
+    ports:
+      - "8009:8009"
+      
+  services:
+    build:
+      context: ./virtualServices
+    ports:
+      - "8010:8010"
+    depends_on:
+      - services_db
+
+  pages_db:
+    image: postgres
+    environment:
+      POSTGRES_USER: isj01
+      POSTGRES_PASSWORD: is067
+      POSTGRES_DB: pages
+    ports:
+      - 5435:5432
+
+  pages:
+    build:
+      context: ./pages
+    ports:
+      - "8011:8011"
+    depends_on:
+      - pages_db

@@ -81,7 +81,7 @@ export default function Reports() {
     // функция изменения статуса отчета
     function new_status(id, status) {
         return function () {
-            axios.patch(`${reports_api_url}/${id}/`, {status: status})
+            axios.patch(`${reports_api_url}/${id}/`, {status: status}, {headers: {sessionid: get_sessionid()}})
             window.location.reload(true);
         }
     }

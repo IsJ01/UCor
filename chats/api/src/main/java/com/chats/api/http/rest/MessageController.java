@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.chats.api.dto.MessageCreateEditDto;
 import com.chats.api.dto.MessageReadDto;
+import com.chats.api.http.connection.UsersUrlConnection;
 import com.chats.api.service.MessageService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 
 @RestController
@@ -49,23 +51,49 @@ public class MessageController {
     
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public MessageReadDto create(@Validated @RequestBody MessageCreateEditDto messageDto) {
-        return messageService.create(messageDto);
+    public ResponseEntity<?> create(@Validated @RequestBody MessageCreateEditDto messageDto,
+                            @RequestHeader("Sessionid") String sessionid) {
+        try { 
+            boolean is_current = UsersUrlConnection.is_current(sessionid, messageDto.getOf());
+            if (is_current) {
+                return new ResponseEntity<>(messageService.create(messageDto), HttpStatus.CREATED);
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } 
+        catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/{id}/")
-    public MessageReadDto update(@PathVariable Long id, @Validated @RequestBody MessageCreateEditDto messageDto) {
-        return messageService.update(id, messageDto)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public ResponseEntity<?> update(@PathVariable Long id, @Validated @RequestBody MessageCreateEditDto messageDto,
+                            @RequestHeader("Sessionid") String sessionid) {
+        try {
+            boolean is_current = UsersUrlConnection.is_current(sessionid, messageDto.getOf());
+            if (is_current) {
+                return new ResponseEntity<>(messageService.update(id, messageDto)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)),
+                    HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/{id}/")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        return messageService.delete(id)
-        ?
-        noContent().build()
-        :
-        notFound().build();
+    public ResponseEntity<?> delete(@PathVariable Long id, @RequestHeader("Sessionid") String sessionid) {
+        try {
+            boolean is_current = UsersUrlConnection.is_current(sessionid, messageService.findById(id).get().getOf());
+            if (is_current) {
+                return messageService.delete(id)
+                    ? noContent().build()
+                    : notFound().build();
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

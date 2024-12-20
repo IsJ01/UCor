@@ -6,8 +6,9 @@ import './css/buttons.css';
 
 import { get_sessionid } from './get_cookies.js';
 import { get_organization_data } from './give_objects.js';
+import { getHeaderText } from "./getText.js";
 
-export default function Header() {
+export default function Header(props) {
     const [user, setUser] = useState({});
     const [title, setTitle] = useState("");
     const api_url = "http://127.0.0.1:8001";
@@ -43,6 +44,13 @@ export default function Header() {
         window.location.reload(true);
     }
 
+    function onSelectLang() {
+        let lang = document.getElementById("lang-select").value;
+        props.setLang(lang);
+    }
+    
+    let text = getHeaderText(props.lang);
+
     return (
         <header>
             <div className="title">
@@ -51,39 +59,48 @@ export default function Header() {
             </div>
             <div className="menuBar">
                 <p className="options">
+                    <select id="lang-select" defaultValue={props.lang} 
+                        onChange={onSelectLang} style={{marginRight: "5px", height: "26px"}}>
+                        <option>Русский (Rus)</option>
+                        <option>English (UK)</option>
+                    </select>
                     { (user.is_superuser || user.is_staff) && 
-                        <a className="option styleBtn" href="/configure/" 
-                        title="Configure">Configure ⚙</a> 
+                        <>
+                            <a className="option styleBtn" href="/configure/" 
+                            title={text.confBtnTitle}>{text.confBtn}</a>
+                            <a className="option styleBtn styleBtn-outline-new" href="/pages/" 
+                            title={text.pagesTitle}>{text.pages}</a>
+                        </>
                     }
                     <a className="option styleBtn styleBtn-outline-neutral"
-                    href="/" title="Home">Home</a>
+                    href="/" title={text.homeBtnTitle}>{text.homeBtn}</a>
                     <a className="option styleBtn styleBtn-outline-detail-1"
-                    href="/users/" title="Users list">Users</a>
+                    href="/users/" title={text.usersBtnTitle}>{text.usersBtn}</a>
                     { user.is_authenticated && 
                         <>
                             {user.is_staff && 
                             <a className="option styleBtn styleBtn-outline-detail-2" 
                                 href="/reports/" 
-                                title="Reports (yours, for you)">Reports</a>}
+                                title={text.reportsBtnTitle}>{text.reportsBtn}</a>}
                             <a className="option styleBtn styleBtn-outline-dark"
                                 href="/blackList/" 
-                                title="Black list of users">Black List</a>
+                                title={text.blackBtnTitle}>{text.blackBtn}</a>
                         </>
                     }
                 </p>
                 { user.is_authenticated ?
                     <p className="login_or_logout">
                         <a href={`/users/${user.id}`}
-                        className="user_label" title="Profile">{ user.username }</a>
+                        className="user_label" title={text.profileTitle}>{ user.username }</a>
                         <button className="user_btn styleBtn styleBtn-outline-warning"
-                        onClick={logout} title="Logout">Logout</button>
+                        onClick={logout} title={text.logoutBtnTitle}>{text.logoutBtn}</button>
                     </p>
                     :
                     <p className="login_or_logout">
                         <a className="user_btn styleBtn styleBtn-outline-ok"
-                        href="/login/" title="Login">Login</a>
+                        href="/login/" title={text.loginBtnTitle}>{text.loginBtn}</a>
                         <a className="user_btn styleBtn styleBtn-outline-new"
-                        href="/register/" title="Register">Registry</a>
+                        href="/register/" title={text.regBtnTitle}>{text.regBtn}</a>
                     </p>
                 }
             </div>

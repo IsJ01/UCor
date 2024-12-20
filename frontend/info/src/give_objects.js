@@ -9,6 +9,14 @@ const report_categories_api_url = "http://127.0.0.1:8006";
 const tasks_api_url = "http://127.0.0.1:8007/api/v1";
 const chats_api_url = "http://127.0.0.1:8008/api/v1/chats";
 const messages_api_url = "http://127.0.0.1:8008/api/v1/messages";
+const tables_api_url = "http://127.0.0.1:8009/api/v1/tables";
+const services_api_url = "http://127.0.0.1:8010/api/v1/services";
+const rows_api_url = "http://127.0.0.1:8010/api/v1/rows";
+const fields_api_url = "http://127.0.0.1:8010/api/v1/fields";
+const pages_api_url = "http://127.0.0.1:8011/api/v1/pages";
+const texts_api_url = "http://127.0.0.1:8011/api/v1/texts";
+const elements_api_url = "http://127.0.0.1:8011/api/v1/elements";
+const props_api_url = "http://127.0.0.1:8011/api/v1/properties";
 
 // данная функция получает api и возвращает функцию, которая возвращает объекты данного api
 
@@ -30,6 +38,13 @@ let get_organization_data = get_objects(data_api_url);
 let get_tasks = get_objects(tasks_api_url);
 let get_chats = get_objects(chats_api_url);
 let get_messages = get_objects(messages_api_url);
+let get_services = get_objects(services_api_url);
+let get_rows = get_objects(rows_api_url);
+let get_fields = get_objects(fields_api_url);
+let get_pages = get_objects(pages_api_url);
+let get_texts = get_objects(texts_api_url);
+let get_elements = get_objects(elements_api_url);
+let get_properties = get_objects(props_api_url);
 
 
 function get_user(id) {
@@ -68,9 +83,12 @@ function get_data_field(id) {
 }
 
 export {
-    users_api_url, reports_api_url, black_list_api_url, user_categories_api_url, report_categories_api_url, data_api_url, tasks_api_url, chats_api_url, messages_api_url,
-    get_users, get_reports, get_black_list, get_user_categories, get_report_categories, get_organization_data,
-    get_user, get_user_from_email, get_report, get_black_user, get_user_category, get_report_category, get_data_field, get_tasks, get_chats, get_messages
+    users_api_url, reports_api_url, black_list_api_url, user_categories_api_url, report_categories_api_url, data_api_url, 
+    tasks_api_url, chats_api_url, messages_api_url, tables_api_url, services_api_url, rows_api_url, fields_api_url, 
+    pages_api_url, texts_api_url, elements_api_url, props_api_url, 
+    get_services, get_rows, get_fields,get_users, get_reports, get_black_list, get_user_categories, get_report_categories, 
+    get_organization_data, get_user, get_user_from_email, get_report, get_black_user, get_user_category, get_report_category, 
+    get_data_field, get_tasks, get_chats, get_messages, get_pages, get_texts, get_elements, get_properties
 }
 
 

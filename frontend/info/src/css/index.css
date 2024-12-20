@@ -13,6 +13,15 @@ header {
     background: rgb(130, 130, 130);
 }
 
+@media screen and (max-width: 1200px) {
+    .header {
+        display: block;
+    }
+    .title label {
+        width: 50px;
+    }
+}
+
 .title {
     display: flex;
 }

@@ -9,6 +9,7 @@ EXPOSE 3000
 
 RUN npm install react
 RUN npm install react-router-dom
-RUN npm install --force axios
+RUN npm install axios
+RUN npm install react-jsx-parser
 
 CMD npm start

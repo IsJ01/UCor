@@ -10,4 +10,4 @@ EXPOSE 8005
 RUN pip install -r requirements.txt
 RUN python manage.py makemigrations api
 RUN python manage.py migrate
-CMD python manage.py runserver 0.0.0.0:8005
+CMD waitress-serve --port=8005 api.wsgi:application
