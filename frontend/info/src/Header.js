@@ -68,12 +68,12 @@ export default function Header(props) {
                         <>
                             <a className="option styleBtn" href="/configure/" 
                             title={text.confBtnTitle}>{text.confBtn}</a>
-                            <a className="option styleBtn styleBtn-outline-new" href="/pages/" 
-                            title={text.pagesTitle}>{text.pages}</a>
                         </>
                     }
                     <a className="option styleBtn styleBtn-outline-neutral"
                     href="/" title={text.homeBtnTitle}>{text.homeBtn}</a>
+                    <a className="option styleBtn styleBtn-outline-new" href="/pages/" 
+                    title={text.pagesTitle}>{text.pages}</a>
                     <a className="option styleBtn styleBtn-outline-detail-1"
                     href="/users/" title={text.usersBtnTitle}>{text.usersBtn}</a>
                     { user.is_authenticated && 
